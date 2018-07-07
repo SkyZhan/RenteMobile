@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="utf-8"> 
+   <title>填写预约信息</title>
+   <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+   <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">  
+   <link rel="stylesheet" type="text/css" href="css/index.css">
+   <link type="text/css" rel="stylesheet" href="css/main.css">
+   <link type="text/css" rel="stylesheet" href="css/pay.css">
+  
+</head>
+<body>
+	<div class="container show_mess">
+		<div class="row clearfix">
+			<div class="col-xs-12 column">
+				<div class="row clearfix">
+					<div class="col-xs-3 column ">
+						<img src="hotel.jpg" width="70px" height="70px" class="radius_angle">
+					</div>
+					<div class="col-xs-9 column f1">
+						<h4 class="padd1">
+							家公馆。某某店
+						</h4>
+						<p>
+							Donec id elit non mi porta gravida at 
+						</p>
+					</div>
+				</div>
+				<div class="row clearfix" style="padding:10px 10px;">
+					<div class="col-xs-6 column">
+						<div class="row clearfix">
+							<span class="label_info">阳光满屋</span>
+							<span class="label_info">独立阳台</span>
+
+						</div>
+					</div>
+
+					<div class="col-xs-6 column">
+						<div class="row clearfix fr">
+							<span class="label_def">远离机场</span>
+							<span class="label_def">啥啥啥啥啥</span>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container form_po font_size1">
+		<form class="form-horizontal" role="form">
+			<div class="form-group">
+				<label for="room_mess" class="col-sm-2 control-label color_nd">选户型房间</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control input_bg" id="firstname" 
+						   placeholder="请选择户型房间">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="pay_date" class="col-sm-2 control-label color_nd">预约时间</label>
+				<div class="col-sm-10 select-time">
+					<input type="text" class="input-enter input_bg form-control">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="pay_money" class="col-sm-2 control-label color_nd">姓名</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control input_bg" id="lastname" 
+						   placeholder="">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="pay_money" class="col-sm-2 control-label color_nd">手机号码</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control  input_bg" id="lastname" 
+						   placeholder="">
+				</div>
+			</div>
+			<div class="form-group ">
+				<div class="row clearfix  ">
+					<div class="col-md-12 column " >
+						 <button type="button" class="btn_fix btn btn-default btn-block  btn_bg color_fn">立即缴纳</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/date.js"></script>
+	<script type="text/javascript">
+	$('.select-time').hotelDate();
+	</script>
+
+</body>
+</html>

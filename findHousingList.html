@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<!-- saved from url=(0121)http://www.quanfangtong.net/phonehtml/findHousingController/findHousingList.action?companyid=Company_20171201103812Jot4V6 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><!--<base href="http://www.quanfangtong.net:80/">--><base href=".">
+
+<script type="text/javascript" src="./findHousingList_files/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="./findHousingList_files/selectTag.js"></script>
+<script type="text/javascript" src="./findHousingList_files/commonPhone.js"></script>
+
+
+<link rel="stylesheet" href="./findHousingList_files/layer.css">
+<script type="text/javascript" src="./findHousingList_files/layer.js"></script><link href="./findHousingList_files/layer(1).css" type="text/css" rel="styleSheet" id="layermcss">
+<script type="text/javascript">
+	var ctx='';
+</script>
+
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="stylesheet" type="text/css" href="./findHousingList_files/index.css">
+<script type="text/javascript" src="./findHousingList_files/jquery.cookie.js"></script>
+<title></title>
+<style type="text/css">
+.span_company{
+	font-family:微软雅黑;
+}
+.con_image{
+	position: relative; 
+    width: 100%; 
+    height: auto;
+    overflow-x:hidden;
+}
+.con_image .images{
+	width: 100%; 
+	height: 198.6px;
+}
+.con_image .ms{
+    position: absolute;
+    bottom: 270px;
+    width: 100%;
+    height: 45px;
+    background: #131313;
+    opacity: 0.6;
+ }
+ .con_image .mon_view{
+  	border-right: 22px solid #FFCC00;
+    border-left: 22px solid #FFCC00;
+    border-bottom: 13px solid transparent;
+    border-top: 60px solid #FFCC00;
+    position: absolute;
+    bottom: 237px;
+    left: 85%;
+    opacity: 1;
+  }
+.con_image .toumingzi{
+    width: 100%;
+    left: 2%;
+   	position: absolute;
+    bottom: 280px;
+   
+}
+.progress {
+    height: 12px;
+    width: 70%;
+    margin: 10px 20px;
+    overflow: hidden;
+    background-color: #ebebeb;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+}
+.progress-bar {
+    float: left;
+    width: 0;
+    height: 100%;
+    font-size: 12px;
+    line-height: 20px;
+    color: #fff;
+    text-align: center;
+    background-color: #337ab7;
+    -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+    -webkit-transition: width .6s ease;
+    -o-transition: width .6s ease;
+    transition: width .6s ease;
+}
+.progress-bar-warning {
+    background-color: #f0ad4e;
+}
+ .con_image .toumingzi span
+ {
+ 	 color: #fff;
+ 	 font-size:16px;
+ }
+ .main_record_div{height:12%;width:100%;font-size:90%;overflow-x:hidden;margin-bottom: 5px;}
+.main_record_div .main_padd{
+	float:left;width:24.8%;height:100%;color:#fff;vertical-align:middle;text-align:center;
+}
+.main_record_div .main_padd .main_ju{
+	height:70%;margin-top:12%;width:100%;border-right:1px solid #dddddd;
+}
+.main_record_div .main_padd .main_ju .main_label{
+	display: block;text-align: center;color: #FFCC00; font-size: 14px;
+}
+.main_record_div .main_padd .main_ju .main_div{
+	font-size: 14px;text-align: center;color: #8c8c8c;
+}
+
+</style>
+<script type="text/javascript">
+	$(function(){
+		var width=$(window).width();
+		var height=$(window).height();
+		$(".main-title").css("width",(width*0.94-90)+"px");
+		$(".main-content img").css("width",(width*0.958*0.32)+"px");
+		$(".main-content img").css("height",(width*0.958*0.32*0.75)+"px");
+		$(".main-content").css("height",(width*0.958*0.32*0.75+10)+"px");
+		$(".main").css("height",(width*0.958*0.32*0.75+75)+"px");
+		$("#div_index_pic img").css("height",(height*0.3)+"px");
+		
+	
+	})
+	
+</script>
+</head>
+<body>
+<div class="box">
+     <img class="indexbanner" src="./findHousingList_images/post.JPG">
+     
+     <div style="width:34px;height:34px;position: absolute;top: 20px;left: 85%;border-radius:50%;background:#fff;text-align: center;vertical-align: middle;">
+<!--	 <div class="indexs-content">-->
+<!--		  <div class="indexsearchright">-->
+		      <input type="hidden" id="keyword" name="keyword" style="-webkit-tap-highlight-color:rgba(0,0,0,0);" value="" placeholder="请输入物业名称关键字">
+<!--	      </div>-->
+          <img style="vertical-align: middle;margin-top:6px;width:56%;" onclick="querySearch()" src="./findHousingList_images/shousuo.png">
+<!--	</div>	  -->
+    </div>
+
+    
+    <div class="top">
+    <ul class="indexlist">
+   	<li>
+   		<a onclick="querySearch1(&#39;housing&#39;)">
+	   		<img src="./findHousingList_images/housing_pic.png" alt="">
+	   		<h3>整租房源</h3>
+   		</a>
+   	</li>
+   	<li>
+   		<a onclick="querySearch1(&#39;cotenant&#39;)">
+	   		<img src="./findHousingList_images/cotenant_pic.png" alt="">
+	   		<h3>合租房源</h3>
+   		</a>
+   	</li>
+   	<li>
+   		<a onclick="querySearch1(&#39;short&#39;)">
+	   		<img src="./findHousingList_images/short_pic.png" alt="">
+	   		<h3>短期租赁</h3>
+   		</a>
+   	</li>
+   	<li>
+   		<a onclick="houseRegist()">
+	   		<img src="./findHousingList_images/owner_pic.png" alt="">
+	   		<h3>业主委托</h3>
+   		</a>
+   	</li>
+   </ul>
+</div>	
+
+</div>
+
+<div id="div_content">
+		
+		<div class="space"></div>
+		<div>
+			<div class="con_image" >
+				<img class="images" src="./findHousingList_images/ample.jpg">
+				<span class="ms"></span>
+				<div class="toumingzi">
+           		 	<span  color="#fff">文字在这</span>
+    			</div>
+    			<div class="mon_view">
+    			</div>
+    			<div style="position: absolute;
+    bottom: 255px;
+    left: 77%;font-size: 12px;color: #FFFFFF;opacity: 1;font-weight: 700;text-align:center;">
+                
+                    ¥<br>{$vo.room_price}<br>&nbsp;整租     
+
+                </div>
+    			<div class="progress">
+				    <div class="progress-bar progress-bar-warning" role="progressbar"
+				         aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+				         style="width: 20%;">
+				    </div>
+				</div>
+				<div class="shengyu" style="position: absolute;margin-left: 78%;margin-top: -25px;font-size: 14px; color: #666666;">
+                	剩余1间
+            	</div>
+
+            	 <hr style="margin-top: 22px;margin-left: 5%;margin-right: 5%;margin-bottom: 7px;">
+
+            	<div class="main_record_div">
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="space"></div>
+		<div>
+			<div class="con_image" >
+				<img class="images" src="./findHousingList_images/ample.jpg">
+				<span class="ms"></span>
+				<div class="toumingzi">
+           		 	<span  color="#fff">文字在这</span>
+    			</div>
+    			<div class="mon_view">
+    			</div>
+    			<div style="position: absolute;
+    bottom: 255px;
+    left: 77%;font-size: 12px;color: #FFFFFF;opacity: 1;font-weight: 700;text-align:center;">
+                
+                    ¥<br>{$vo.room_price}<br>&nbsp;整租     
+
+                </div>
+    			<div class="progress">
+				    <div class="progress-bar progress-bar-warning" role="progressbar"
+				         aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+				         style="width: 20%;">
+				    </div>
+				</div>
+				<div class="shengyu" style="position: absolute;margin-left: 78%;margin-top: -25px;font-size: 14px; color: #666666;">
+                	剩余1间
+            	</div>
+
+            	 <hr style="margin-top: 22px;margin-left: 5%;margin-right: 5%;margin-bottom: 7px;">
+
+            	<div class="main_record_div">
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div id="none"  style="padding-top:5px;background-color: #f2f2f2;width:100%;height:40px;text-align:center;color:#8c8c8c">
+        没有更多了
+    </div>
+
+		
+	
+
+</div>
+<!--房间信息展示结束-->
+
+</body></html>

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="screen-orientation" content="portrait">
+	<meta name="x5-orientation" content="portrait">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>在线找房列表</title>
+
+	<script type="text/javascript" src="./inlineHousingList_files/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="./inlineHousingList_files/selectTag.js"></script>
+	<script type="text/javascript" src="./inlineHousingList_files/commonPhone.js"></script>
+
+	<link rel="stylesheet" href="./inlineHousingList_files/layer.css">
+	<link rel="stylesheet" href="./inlineHousingList_files/hezu.css">
+	<style type="text/css">
+		li{border-collapse: collapse;table-layout:fixed;text-overflow:ellipsis;overflow:hidden;white-space: nowrap;}
+		
+	</style>
+	<script type="text/javascript">
+	$(function(){
+		var saletype=$.cookie('saletype');
+		var sort=$.cookie('input_sort');
+		var characteristic=$.cookie('input_characteristic');
+		var area=$.cookie('input_area');
+		var propertyAdrrid=$.cookie('input_property_adrrid');
+		var rentmoney=$.cookie('input_rentmoney');
+		var layout=$.cookie('input_houseType');
+		if(sort!=null){
+			$(".input_sort li").each(function(i,item){
+				var li_class= $(this).attr("class");
+				var li_value= $(this).attr("name");
+				if(sort==li_class){
+					$("#input_sort").val(li_value);
+					$("."+li_class).css("color","#00AF64");
+					$("."+li_class +" img").css("display","block");
+				}else{
+					$("."+li_class).css("color","#808080");
+					$("."+li_class +" img").css("display","none");
+				}
+			})
+		}
+		if(characteristic!=null){
+			$("#input_characteristic").val($("."+characteristic).text());
+			$("."+characteristic).css("color","#00AF64");
+			$("."+characteristic).css("border","1px solid #00AF64");
+		}
+		if(rentmoney!=null){
+			$("#input_rentmoney").val($("."+rentmoney).text());
+			$("."+rentmoney).css("color","#00AF64");
+			$("."+rentmoney).css("border","1px solid #00AF64");
+		}
+		if(layout!=null){
+			$("#input_houseType").val($("."+layout).text());
+			$("."+layout).css("color","#00AF64");
+			$("."+layout).css("border","1px solid #00AF64");
+		}
+		if(area==null){
+			$(".input_area li").each(function(i,item){
+				if(i==0){
+					var ids= $(this).attr("id");
+					var divalue= $(this).attr("name");
+					findTradeByArea(ids,divalue);
+				}
+			})
+		}else{
+			$(".input_area li").each(function(i,item){
+				var ids= $(this).attr("id");
+				var divalue= $(this).attr("name");
+				var diclass= $(this).attr("class");
+				if(area==diclass){
+					$("#input_area").val(divalue);
+					findTradeByArea(ids,divalue);
+					$(this).css("color","#00AF64");
+				}else{
+					$(this).css("color","#808080");
+					$(this).css("background","#fff");
+				}
+			})
+			$(".input_property_adrrid li").each(function(){
+				var ids= $(this).attr("class");
+				var divalue= $(this).attr("name");
+				if(propertyAdrrid==ids){
+					$("#input_property_adrrid").val(divalue);
+					$(this).css("color","#00AF64");
+				}else{
+					$(this).css("color","#808080");
+				}
+			})
+		}
+
+		var height=$(window).height();
+		var width=$(window).width();
+		$(".content").css("height",(height-88)+"px");
+		var size='23';
+		$(".houseType_div").css("height",40*Math.ceil(size/4)+"px");
+		querySearch();
+		
+	})
+	
+	function querySearch(){
+		var companyid='Company_20171201103812Jot4V6';
+		var keyword=$("#keyword").val();
+		var saletype='cotenant';
+		var sort=$("#input_sort").val();
+		var characteristic=$("#input_characteristic").val();
+		var area=$("#input_area").val();
+		var propertyAdrrid=$("#input_property_adrrid").val();
+		var rentmoney=$("#input_rentmoney").val();
+		var layout=$("#input_houseType").val();
+		$.ajax({
+			url :ctx+"/phonehtml/findHousingController/findHousingTable.action",
+			type : "POST",
+			data : {"currentPage":1,"pageCount":20,"keyword":keyword,"saletype":saletype,"companyid":companyid,"sort":sort,"characteristic":characteristic,"houseAreaid":area,"propertyAdrrid":propertyAdrrid,"rentmoney":rentmoney,"layout":layout},
+			beforeSend:function(XMLHttpRequest){
+	          	$(".content").html("<div style='margin-top:20%;text-align:center;'><img width='15%' src='/images/phonehtml/rumi/loading.gif'/></div>");//在后台返回success之前显示loading图标
+	     	}, 
+			success : function(data){
+				$(".content").html(data);
+			}
+		})
+		$.cookie('saletype', saletype,{ expires: 7 });
+	}
+	function showCondition(type){
+		$(".combobox-list li").each(function(){
+			if(this.id!=''){
+				if(type==this.id){
+					$("."+this.id+"_title img").attr("src","images/phonehtml/online/pull4.png");
+					$("."+this.id+"_title").css("color","#00AF64");
+				}else{
+					$("."+this.id+"_title img").attr("src","images/phonehtml/online/pull3.png");
+					$("."+this.id+"_title").css("color","#121212");
+				}
+			}
+		})
+		$("#content #sort").css("display","none");;
+		$("#content #characteristic").css("display","none");
+		$("#content #area").css("display","none");
+		$("#content #rentmoney").css("display","none");
+		
+		$("#mask").fadeIn();
+		$("#condition").fadeIn();
+		$("#content #"+type).fadeIn();
+	}
+	function hiddenCondition(){
+		$("#mask").fadeOut();
+		$("#condition").fadeOut();
+		$("#content #sort").fadeOut();
+		$("#content #characteristic").fadeOut();
+		$("#content #area").fadeOut();
+		$("#content #rentmoney").fadeOut();
+	}
+	function findTradeByArea(areaid,divalue){
+		if(areaid=='area_unlimited'){
+			$("#trade").html("<li class=\"input_property_adrrid_property\" onclick=\"setProperty('"+areaid+"','"+divalue+"','property_unlimited','property')\" style=\"padding-left:10px;text-indent: 10px;height:50px;line-height:50px;width:100%;border-bottom:1px solid #dddddd;color:#6C6C6C;\">不限</li>");
+			$("#ul_area li").each(function(){
+				var ids= $(this).attr("id");
+				if(areaid==ids){
+					$(this).css("color","#00AF64");
+				}else{
+					$(this).css("color","#808080");
+					$(this).css("background","#fff");
+				}
+			})
+		}else{
+			var findAllRumiTrade='[{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1514271570994","ordernum":"1","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171226145930J73aYQ","createtime":"1516368221545","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山社区底商：龙吟大街17号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1530072725987","ordernum":"1","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180627121205JL4XH5","createtime":"1530072725990","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山四社商铺：十八巷1号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1530072726000","ordernum":"1","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180627121206Jshg0Y","createtime":"1530072726003","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山四社商铺：十七巷2号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1520496687958","ordernum":"2","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180308161127JZmDXW","createtime":"1520747323683","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山3号楼：龙吟大街十八巷10号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"113.374200-23.084807-海珠区","ordernum":"2","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171205123003JNAT3W","createtime":"1527950344771","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山1号楼：龙吟大街13巷17号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1512453507145","ordernum":"2","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171205135827J8EHZA","createtime":"1527950359894","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山2号楼：龙吟大街13巷18号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1524056468033","ordernum":"2","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180418210108JnFIL4","createtime":"1527950369610","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山4号楼：龙吟大街18巷10号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1524056468042","ordernum":"2","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180418210108JnIT9V","createtime":"1527950376615","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山5号楼：龙吟大街14巷13号(冼）","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1524056468050","ordernum":"2","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180418210108JeKSfv","createtime":"1527950383013","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山6号楼：龙吟大街17巷15号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1524056468085","ordernum":"2","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180418210108JcLmkr","createtime":"1527950389708","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山7号楼：龙吟大街18巷15号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1524056468095","ordernum":"3","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180418210108Jzu2SX","createtime":"1527950398287","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山8号楼：龙吟大街1巷18号(官洲北苑）","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1524056468103","ordernum":"3","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180418210108JaBXRd","createtime":"1527950405000","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山9号楼：龙吟大街60号(池塘边）","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1525344477269","ordernum":"3","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180503184757JaEFKT","createtime":"1527950416673","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山10号：龙吟大街21巷8号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1527949521261","ordernum":"4","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180602222521JbpFvv","createtime":"1527949521264","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山11号楼：龙吟大街20巷4号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1527949521277","ordernum":"4","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180602222521JNFETk","createtime":"1527949521280","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山12号楼：龙吟大街12巷21号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1527048253492","ordernum":"10","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180523120413Jv9M9y","createtime":"1527950611824","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山13号楼：龙吟大街38号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1529894588098","ordernum":"11","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180625104308Js4Kll","createtime":"1529894588101","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山14号楼：龙吟大街18巷16号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1529894675583","ordernum":"11","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180625104435Jd39Ul","createtime":"1529894675585","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山15号楼：龙吟大街20巷7号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1529894675591","ordernum":"11","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180625104435Js4YnE","createtime":"1529894675593","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山16号楼：龙吟大街18巷6号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1530450272176","ordernum":"11","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180701210432Jcu6S1","createtime":"1530450272179","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山17号：龙吟大街19巷7号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"113.761760-23.579148-增城区","ordernum":"11","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180701210448J4O1N4","createtime":"1530450295807","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山18号：龙吟大街17巷13号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1512448223344","ordernum":"12","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171205123023J6Ii7V","createtime":"1516590257768","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头1号楼:仑头村启明访四巷12号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056130010","ordernum":"12","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171212132210JbwoA3","createtime":"1516590296177","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头2号楼：仑头村南便涌7号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056130017","ordernum":"13","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171212132210JniHIB","createtime":"1516590320662","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头3号楼：仑头南约1巷15号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056130024","ordernum":"14","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171212132210JdHR3O","createtime":"1516590343360","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头4号楼：仑头北约一巷21号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056130031","ordernum":"15","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171212132210JFZT0r","createtime":"1516590499567","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头5号楼:仑头北约四巷16号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056130038","ordernum":"16","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171212132210JFEXE0","createtime":"1516590518105","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头6号楼:仑头西约横街九巷2号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056130044","ordernum":"17","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171212132210JlQvfh","createtime":"1516590534350","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头7号楼:仑头中约八巷4号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"113.373803-23.078229-海珠区","ordernum":"18","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171212132332JCL6PK","createtime":"1516590560065","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头8号楼:仑头启明坊四巷10号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056212384","ordernum":"19","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171212132332J4jvEx","createtime":"1516590581607","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头9号楼：仑头村车站南41号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056212391","ordernum":"20","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171212132332JduO3e","createtime":"1516590602216","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头10号楼:仑头街市12号2-3层","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1512525157092","ordernum":"21","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20171206095237JMPczN","createtime":"1516590636164","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头11号:仑头村启明坊外街9号1至4层(江景店)","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1518082495995","ordernum":"22","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180208173455J8dFL1","createtime":"1518082495997","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"仑头12号：仑头环村北路15号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1530594176901","ordernum":"26","creater":"admin","parentid":"Dicitem_20171205114029JdojGG","id":"Dicitem_20180703130256JNBOMT","createtime":"1530594176904","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"北山19号：龙吟大街19巷12号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1515653246351","ordernum":"1","creater":"13802643735","parentid":"Dicitem_20171205122906JrllR3","id":"Dicitem_20180111144726JHjqyh","createtime":"1516368128451","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"黄边2号楼：黄边南路258号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1515653275222","ordernum":"2","creater":"13802643735","parentid":"Dicitem_20171205122906JrllR3","id":"Dicitem_20180111144755JAz1ec","createtime":"1516368133437","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"黄边3号楼：黄边南路258号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1515653300150","ordernum":"3","creater":"13802643735","parentid":"Dicitem_20171205122906JrllR3","id":"Dicitem_20180111144820JFAw8X","createtime":"1516368140863","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"黄边4号楼：黄边南路258号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1515653317817","ordernum":"4","creater":"13802643735","parentid":"Dicitem_20171205122906JrllR3","id":"Dicitem_20180111144837J2rgLO","createtime":"1516368146721","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"黄边5号楼：黄边南路258号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056363551","ordernum":"5","creater":"admin","parentid":"Dicitem_20171205122906JrllR3","id":"Dicitem_20171212132603J4E3ND","createtime":"1516368255408","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"嘉禾望岗社区：上胜东街","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1512448267052","ordernum":"1","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171205123107JYBu5u","createtime":"1516590731261","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"沙涌1号楼:沙涌涌边4巷17号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"113.242744-23.081280-荔湾区","ordernum":"2","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212132034JGB4UX","createtime":"1516590746601","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"沙涌2号楼:沙涌青紫大街30号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056260303","ordernum":"3","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212132420JQtmUF","createtime":"1516590765079","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"沙涌3号楼:芳村西坑大街17号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056260447","ordernum":"4","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212132420J50obI","createtime":"1516590783097","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"沙涌4号楼:芳村西坑大街18号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1512448267061","ordernum":"5","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171205123107JH2g3t","createtime":"1521340983798","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱1号楼：麦村北约40号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"113.230629-23.060589-荔湾区","ordernum":"6","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212132953JOcweo","createtime":"1521698322815","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱2号楼:麦村东约25号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056593258","ordernum":"7","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212132953J0iX5N","createtime":"1521341139283","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱3号楼：南安七巷5号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1518147010921","ordernum":"7","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20180209113010J0Wpyt","createtime":"1521341529808","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱3号楼：南安七巷24号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513926718425","ordernum":"8","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171222151158JRg6ZS","createtime":"1521341109679","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱小3号楼：南安八巷3号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056593265","ordernum":"9","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212132953J8phK1","createtime":"1521341398822","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱4号楼：南安七巷3号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056593271","ordernum":"10","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212132953JVO7YZ","createtime":"1521341406876","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱5号楼：南安七巷2号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056593277","ordernum":"12","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212132953Jksf9C","createtime":"1521341417585","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱6号楼：麦村北约2号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056593283","ordernum":"12","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212132953J4dKmV","createtime":"1521341425579","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱7号楼：麦村北约3号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056662696","ordernum":"13","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133102J2LC1m","createtime":"1521341434099","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱8号楼：南安五巷6号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056662703","ordernum":"14","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133102JdXBfT","createtime":"1521341441143","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱9号楼：麦村朝阳里22号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056662709","ordernum":"15","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133102JhdVVk","createtime":"1521341448096","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱10号楼：麦标东约45号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056662721","ordernum":"16","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133102Jyo2FE","createtime":"1521341454477","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱11号楼：麦村东约43号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056662728","ordernum":"17","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133102JMpMpy","createtime":"1521341461487","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱12号楼：江夏村7号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056662735","ordernum":"18","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133102J8VwpI","createtime":"1521341467851","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱13号楼：麦村东约69号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056718055","ordernum":"19","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133158JqP2do","createtime":"1521341475523","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱14号楼：麦村东约66号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056718062","ordernum":"20","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133158JCxQXX","createtime":"1521341482375","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱15号楼：麦村北约45号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"113.302387-23.092987-海珠区","ordernum":"21","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133158JoYnpp","createtime":"1521341509467","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱16号楼：麦村东约61号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056718088","ordernum":"22","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133158JkFiOj","createtime":"1521341516695","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱17号楼：裕安围西约108号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1513056718096","ordernum":"23","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20171212133158JXjrqO","createtime":"1521341523479","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西塱18号楼：西朗永安西边三巷3-1号","ispubDic":"2","currentPage":"1"},{"pageCount":"8","childDicCode":"","isdefault":"1","dtcode":"area","dicRank":"2","divalue":"1524217499870","ordernum":"24","creater":"admin","parentid":"Dicitem_20171205122407J3Nixf","id":"Dicitem_20180420174459JBjgDB","createtime":"1524217499873","companyid":"Company_20171201103812Jot4V6","dictypeCode":"","diname":"西朗：社区中心","ispubDic":"2","currentPage":"1"}]';
+			var obj = eval('(' + findAllRumiTrade + ')');
+			var html="<li class=\"input_property_adrrid_none\" onclick=\"setProperty('"+areaid+"','"+divalue+"','','')\" style=\"padding-left:10px;text-indent: 10px;height:50px;line-height:50px;width:100%;border-bottom:1px solid #dddddd;\">不限</li>";
+			$.each(obj, function(i, item){ 
+				if(areaid==item.parentid){
+					html+="<li class=\"input_property_adrrid_"+item.id+"\" name=\""+item.divalue+"\" onclick=\"setProperty('"+areaid+"','"+divalue+"','"+item.divalue+"','"+item.id+"')\" style=\"padding-left:10px;text-indent: 10px;height:50px;line-height:50px;width:100%;border-bottom:1px solid #dddddd;\">"+item.diname+"</li>";
+				}
+			})
+			$("#trade").html(html);
+			$("#ul_area li").each(function(){
+				var ids= $(this).attr("id");
+				if(areaid==ids){
+					$(this).css("color","#00AF64");
+				}else{
+					$(this).css("color","#808080");
+				}
+			})
+			var propertyAdrrid=$.cookie('input_property_adrrid');
+			$(".input_property_adrrid li").each(function(i,item){
+				var li_class= $(this).attr("class");
+				if(propertyAdrrid==li_class){
+					$("."+li_class).css("color","#00AF64");
+				}else{
+					$("."+li_class).css("color","#808080");
+				}
+			})
+		}
+	}
+	function setValue(type,number,_value){
+		$("#"+type).val(_value);
+		var li_click=type+"_"+number;
+		if(type=='input_characteristic'||type=='input_rentmoney'||type=='input_houseType'){
+			for(var i=0;i<8;i++){
+				if(i==number){
+					$("."+li_click).css("color","#00AF64");
+					$("."+li_click).css("border","1px solid #00AF64");
+				}else{
+					$("."+type+"_"+i).css("color","#808080");
+					$("."+type+"_"+i).css("border","0");
+				}
+			}
+			$.cookie(type, type+"_"+number,{ expires: 7 });
+			//hiddenCondition();
+			//querySearch();
+		}else{
+			$("."+type+" li").each(function(i,item){
+				var li_class= $(this).attr("class");
+				if(li_click==li_class){
+					$("."+li_class).css("color","#00AF64");
+				}else{
+					$("."+li_class).css("color","#6C6C6C");
+				}
+			})
+			if(type=='input_sort'){//排序
+				$(".input_sort li").each(function(i,item){
+					var li_class= $(this).attr("class");
+					var li_value= $(this).attr("name");
+					if(li_click==li_class){
+						$("."+li_class +" img").css("display","block");
+					}else{
+						$("."+li_class +" img").css("display","none");
+					}
+				})
+			}
+			$.cookie(type, type+"_"+number,{ expires: 7 });
+			hiddenCondition();
+			querySearch();
+		}
+	}
+	function setValue_houseType(type,number,_value){
+		$("#"+type).val(_value);
+		var li_click=type+"_"+number;
+		var size='23';
+		for(var i=0;i<size;i++){
+			if(i==number){
+				$("."+li_click).css("color","#00AF64");
+				$("."+li_click).css("border","1px solid #00AF64");
+			}else{
+				$("."+type+"_"+i).css("color","#808080");
+				$("."+type+"_"+i).css("border","0");
+			}
+		}
+		$.cookie(type, type+"_"+number,{ expires: 7 });
+	}
+	//重置
+	function Reset(type){
+		$("#"+type).val("");
+		for(var i=0;i<8;i++){
+			$("."+type+"_"+i).css("color","#808080");
+			$("."+type+"_"+i).css("border","0");
+		}
+	}
+	//确定
+	function confire(){
+		hiddenCondition();
+		querySearch();
+	}
+	function setProperty(areaid,diarea,diproperty,propertyid){
+		if(areaid=='area_unlimited'){
+			$("#input_area").val("");
+		}else{
+			$("#input_area").val(diarea);
+		}
+		if(diproperty=='property_unlimited'){
+			$("#input_property_adrrid").val("");
+		}else{
+			$("#input_property_adrrid").val(diproperty);
+		}
+
+		var li_area="input_area_"+areaid;
+		$.cookie("input_area", "input_area_"+areaid,{ expires: 7 });
+		$(".input_area li").each(function(i,item){
+			var li_class= $(this).attr("class");
+			if(li_area==li_class){
+				$("."+li_class).css("color","#00AF64");
+			}else{
+				$("."+li_class).css("color","#6C6C6C");
+			}
+		})
+		var li_property="input_property_adrrid_"+propertyid;
+		$.cookie("input_property_adrrid", "input_property_adrrid_"+propertyid,{ expires: 7 });
+		$(".input_property_adrrid li").each(function(i,item){
+			var li_class= $(this).attr("class");
+			if(li_property==li_class){
+				$("."+li_class).css("color","#00AF64");
+			}else{
+				$("."+li_class).css("color","#6C6C6C");
+			}
+		})
+		hiddenCondition();
+		querySearch();
+	}
+
+	function gotoPgae(page){
+		var companyid='Company_20171201103812Jot4V6';
+		var sort=$("#input_sort").val();
+		var characteristic=$("#input_characteristic").val();
+		var area=$("#input_area").val();
+		var propertyAdrrid=$("#input_property_adrrid").val();
+		var rentmoney=$("#input_rentmoney").val();
+		var saletype=$("#saletype").val();
+		$.ajax({
+			url :ctx+"/phonehtml/findHousingController/findHousingTable.action",
+			type : "POST",
+			data : {"currentPage":page,"pageCount":20,"saletype":saletype,"companyid":companyid,"sort":sort,"characteristic":characteristic,"houseAreaid":area,"propertyAdrrid":propertyAdrrid,"rentmoney":rentmoney},
+			beforeSend:function(XMLHttpRequest){
+	          	$(".content").html("<div style='margin-top:20%;text-align:center;'><img width='15%' src='/images/phonehtml/rumi/loading.gif'/></div>");//在后台返回success之前显示loading图标
+	     	}, 
+			success : function(data){
+				$(".content").html(data);
+			}
+		})
+	}
+	function return_index(){
+		var companyid='Company_20171201103812Jot4V6';
+		window.location.href=ctx+"/phonehtml/findHousingController/findHousingList.action?companyid="+companyid;
+	}
+</script>
+</head>
+<body>
+	<input type="hidden" id="input_sort" name="input_sort" value="0">
+	<input type="hidden" id="input_characteristic" name="input_characteristic" value="房租月付">
+	<input type="hidden" id="input_area" name="input_area" value="">
+	<input type="hidden" id="input_property_adrrid" name="input_property_adrrid" value="">
+	<input type="hidden" id="input_rentmoney" name="input_rentmoney">
+	<input type="hidden" id="input_houseType" name="input_houseType">
+	<!--<input type="hidden" id="keyword" name="keyword" value=""/>-->
+	<input type="hidden" id="saletype" name="saletype" value="cotenant">
+	<div class="box">
+	<div style="width:100%;height:40px;">
+		<div style="width:100%;height:10px;"></div>
+		<div style="float:left;line-height:30px;width:15%;text-align: center;" onclick="">
+			<img style="width:16%;vertical-align: middle;" src="./inlineHousingList_images/Sharp.png">
+		</div>
+		<div class="indexsearchright" style="float:left;background:#E6E6E6;">
+	       <input type="text" id="keyword" name="keyword" style="" value="" placeholder="请输入物业名称关键字">
+	    </div>
+	    <div style="float:left;line-height:30px;width:15%;text-align: center;color:#00AE66;font-size:14px;" onclick="">确定</div>
+	</div>
+	<div class="combobox">
+	   <ul class="combobox-list">
+	   	   <li class="" onclick="showCondition(&#39;sort&#39;)" style="-webkit-tap-highlight-color:rgba(0,0,0,0);">排序<img src="./inlineHousingList_images/pull3.png"></li>
+	       <li class="" onclick="showCondition(&#39;characteristic&#39;)" style="-webkit-tap-highlight-color:rgba(0,0,0,0);">特色<img src="./inlineHousingList_images/pull3.png"></li>
+	       <li class="" onclick="showCondition(&#39;area&#39;)" style="-webkit-tap-highlight-color:rgba(0,0,0,0);">区域<img src="./inlineHousingList_images/pull3.png"></li>
+	       <li class="" onclick="showCondition(&#39;rentmoney&#39;)" style="-webkit-tap-highlight-color:rgba(0,0,0,0);">更多<img src="./inlineHousingList_images/pull3.png"></li>
+	   </ul>
+	</div>
+	<!-- 遮罩层 -->
+	<div id="mask" onclick="hiddenCondition()" style="position: fixed; top: 0px; left: 0px; height: 100%; width: 100%; background: rgba(0, 0, 0, 0.46); z-index: 998; display: block;">
+	</div>
+	<div id="condition" style="font-size: 14px; position: fixed; background: rgb(255, 255, 255); max-height: 300px; top: 0px; left: 0px; width: 100%; z-index: 999; display: block;">
+		<div class="combobox">
+		   <ul class="combobox-list">
+		   	   <li id="sort" class="sort_title" onclick="showCondition(&#39;sort&#39;)" style="color: rgb(18, 18, 18);">排序<img src="./inlineHousingList_images/pull3.png"></li>
+		       <li id="characteristic" class="characteristic_title" onclick="showCondition(&#39;characteristic&#39;)" style="color: rgb(0, 175, 100);">特色<img src="./inlineHousingList_images/pull4.png"></li>
+		       <li id="area" class="area_title" onclick="showCondition(&#39;area&#39;)" style="color: rgb(18, 18, 18);">区域<img src="./inlineHousingList_images/pull3.png"></li>
+		       <li id="rentmoney" class="rentmoney_title" onclick="showCondition(&#39;rentmoney&#39;)" style="color: rgb(18, 18, 18);">更多<img src="./inlineHousingList_images/pull3.png"></li>
+		   </ul>
+		</div>
+		<div id="content">
+			<div id="sort" class="input_sort" style="width: 100%; display: none;">
+				<ul style="width:100%;color:#6C6C6C;">
+					<li class="input_sort_0" name="0" onclick="setValue(&#39;input_sort&#39;,&#39;0&#39;,&#39;0&#39;)" style="text-indent: 8px; height: 50px; line-height: 50px; width: 90%; margin-left: 5%; border-bottom: 1px solid rgb(221, 221, 221); color: rgb(0, 175, 100);">价格从低到高<img style="width: 4%; float: right; margin-top: 18px; display: block;" src="./inlineHousingList_images/gou.png"></li>
+					<li class="input_sort_1" name="1" onclick="setValue(&#39;input_sort&#39;,&#39;1&#39;,&#39;1&#39;)" style="text-indent: 8px; height: 50px; line-height: 50px; width: 90%; margin-left: 5%; color: rgb(108, 108, 108);">价格从高到底<img style="width:4%;float:right;margin-top:18px;display:none;" src="./inlineHousingList_images/gou.png"></li>
+				</ul>
+			</div>
+			<div id="characteristic" class="input_characteristic" style="width: 100%;">
+				<div style="color:#828282;width:100%;text-align: left;font-size:16px;height:40px;line-height:40px;text-indent: 10px;">特色</div>
+				<div style="width:100%;font-size:14px;height:80px;">
+					<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div style="border-radius: 2px; color: rgb(128, 128, 128); width: 80%; margin-left: 10%; height: 30px; line-height: 30px; background: rgb(245, 245, 245); border: 0px;" class="input_characteristic_0" onclick="setValue(&#39;input_characteristic&#39;,&#39;0&#39;,&#39;独卫&#39;)">独卫</div>
+					</div>
+					<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div style="border-radius: 2px; color: rgb(128, 128, 128); width: 80%; margin-left: 10%; height: 30px; line-height: 30px; background: rgb(245, 245, 245); border: 0px;" class="input_characteristic_1" onclick="setValue(&#39;input_characteristic&#39;,&#39;1&#39;,&#39;独立阳台&#39;)">独立阳台</div>
+					</div>
+					<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div style="border-radius: 2px; color: rgb(128, 128, 128); width: 80%; margin-left: 10%; height: 30px; line-height: 30px; background: rgb(245, 245, 245); border: 0px;" class="input_characteristic_2" onclick="setValue(&#39;input_characteristic&#39;,&#39;2&#39;,&#39;双卫&#39;)">双卫</div>
+					</div>
+					<div style="color:#828282;float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div style="border-radius: 2px; color: rgb(128, 128, 128); width: 80%; margin-left: 10%; height: 30px; line-height: 30px; background: rgb(245, 245, 245); border: 0px;" class="input_characteristic_3" onclick="setValue(&#39;input_characteristic&#39;,&#39;3&#39;,&#39;外阳台&#39;)">外阳台</div>
+					</div>
+					<div style="color:#828282;float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div style="border-radius: 2px; color: rgb(128, 128, 128); width: 80%; margin-left: 10%; height: 30px; line-height: 30px; background: rgb(245, 245, 245); border: 0px;" class="input_characteristic_4" onclick="setValue(&#39;input_characteristic&#39;,&#39;4&#39;,&#39;临地铁&#39;)">临地铁</div>
+					</div>
+					<div style="color:#828282;float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div style="border-radius: 2px; color: rgb(128, 128, 128); width: 80%; margin-left: 10%; height: 30px; line-height: 30px; background: rgb(245, 245, 245); border: 0px;" class="input_characteristic_5" onclick="setValue(&#39;input_characteristic&#39;,&#39;5&#39;,&#39;智能锁&#39;)">智能锁</div>
+					</div>
+					<div style="color:#828282;float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div style="border-radius: 2px; color: rgb(0, 175, 100); width: 80%; margin-left: 10%; height: 30px; line-height: 30px; background: rgb(245, 245, 245); border: 1px solid rgb(0, 175, 100);" class="input_characteristic_6" onclick="setValue(&#39;input_characteristic&#39;,&#39;6&#39;,&#39;房租月付&#39;)">房租月付</div>
+					</div>
+					<div style="color:#828282;float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div style="border-radius: 2px; color: rgb(128, 128, 128); width: 80%; margin-left: 10%; height: 30px; line-height: 30px; background: rgb(245, 245, 245); border: 0px;" class="input_characteristic_7" onclick="setValue(&#39;input_characteristic&#39;,&#39;7&#39;,&#39;短租&#39;)">短租</div>
+					</div>
+				</div>
+				<div style="width:100%;height:40px;background:#F9F9F9;margin-top:10px;padding-top:10px;">
+					<div style="float:left;width: 25%;text-align: center;height:30px;">
+						<div onclick="Reset(&#39;input_characteristic&#39;)" style="border-radius:2px;color:#828282;width:70%;margin-left:15%;height:30px;line-height:30px;color:#808080;border-radius:2px;border:1px solid #ccc;">重置</div>
+					</div>
+					<div style="float:right;width: 25%;text-align: center;height:30px;">
+						<div onclick="confire()" style="border-radius:2px;color:#828282;width:70%;margin-left:15%;height:30px;line-height:30px;background:#00AE66;color:#fff;border-radius:2px;">确定</div>
+					</div>
+				</div>
+			</div>
+			<div id="area" style="width:100%;display: none;">
+				<ul id="ul_area" class="input_area" style="width:50%;color:#6C6C6C;float:left;background:#fff;height: 305px;overflow-y: scroll;-webkit-transform:translate3d(0,0,0);-webkit-overflow-scrolling: touch;">
+					<li id="area_unlimited" class="input_area_area_unlimited" name="name_unlimited" onclick="findTradeByArea(&#39;area_unlimited&#39;,&#39;name_unlimited&#39;)" style="text-indent: 10px; height: 50px; line-height: 50px; width: 100%; border-bottom: 1px solid rgb(221, 221, 221); padding-left: 10px; color: rgb(0, 175, 100);">区域</li>
+					
+						<li id="Dicitem_20171205114029JdojGG" class="input_area_Dicitem_20171205114029JdojGG" name="113.317388-23.083801-海珠区" onclick="findTradeByArea(&#39;Dicitem_20171205114029JdojGG&#39;,&#39;113.317388-23.083801-海珠区&#39;)" style="text-indent: 10px; height: 50px; line-height: 50px; width: 100%; padding-left: 10px; border-bottom: 1px solid rgb(221, 221, 221); color: rgb(128, 128, 128); background: rgb(255, 255, 255);">海珠区</li>
+					
+						<li id="Dicitem_20171205122407J3Nixf" class="input_area_Dicitem_20171205122407J3Nixf" name="113.244261-23.125981-荔湾区" onclick="findTradeByArea(&#39;Dicitem_20171205122407J3Nixf&#39;,&#39;113.244261-23.125981-荔湾区&#39;)" style="text-indent: 10px; height: 50px; line-height: 50px; width: 100%; padding-left: 10px; border-bottom: 1px solid rgb(221, 221, 221); color: rgb(128, 128, 128); background: rgb(255, 255, 255);">荔湾区</li>
+					
+						<li id="Dicitem_20171205122906JrllR3" class="input_area_Dicitem_20171205122906JrllR3" name="1512448146178" onclick="findTradeByArea(&#39;Dicitem_20171205122906JrllR3&#39;,&#39;1512448146178&#39;)" style="text-indent: 10px; height: 50px; line-height: 50px; width: 100%; padding-left: 10px; border-bottom: 1px solid rgb(221, 221, 221); color: rgb(128, 128, 128); background: rgb(255, 255, 255);">白云区</li>
+					
+				</ul>
+				<ul id="trade" class="input_property_adrrid" style="width:50%;color:#6C6C6C;float:left;height: 305px;background:#f0f0f0;overflow-y: scroll;-webkit-transform:translate3d(0,0,0);-webkit-overflow-scrolling: touch;"><li class="input_property_adrrid_property" onclick="setProperty(&#39;area_unlimited&#39;,&#39;name_unlimited&#39;,&#39;property_unlimited&#39;,&#39;property&#39;)" style="padding-left:10px;text-indent: 10px;height:50px;line-height:50px;width:100%;border-bottom:1px solid #dddddd;color:#6C6C6C;">不限</li></ul>
+			</div>
+			<div id="rentmoney" class="input_rentmoney" style="width:100%;display: none;">
+				<div style="color:#828282;width:100%;text-align: left;font-size:16px;height:40px;line-height:40px;text-indent: 10px;">租金</div>
+				<div style="width:100%;font-size:14px;height:80px;border-bottom:1px solid #ccc;">
+					<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div class="input_rentmoney_0" onclick="setValue(&#39;input_rentmoney&#39;,&#39;0&#39;,&#39;1-999&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">1-999</div>
+					</div>
+					<div style="color:#828282;float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div class="input_rentmoney_1" onclick="setValue(&#39;input_rentmoney&#39;,&#39;1&#39;,&#39;1000-1999&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">1000-1999</div>
+					</div>
+					<div style="color:#828282;float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div class="input_rentmoney_2" onclick="setValue(&#39;input_rentmoney&#39;,&#39;2&#39;,&#39;2000-2999&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">2000-2999</div>
+					</div>
+					<div style="color:#828282;float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div class="input_rentmoney_3" onclick="setValue(&#39;input_rentmoney&#39;,&#39;3&#39;,&#39;3000-3999&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">3000-3999</div>
+					</div>
+					<div style="color:#828282;float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div class="input_rentmoney_4" onclick="setValue(&#39;input_rentmoney&#39;,&#39;4&#39;,&#39;4000-4999&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">4000-4999</div>
+					</div>
+					<div style="color:#828282;float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+						<div class="input_rentmoney_5" onclick="setValue(&#39;input_rentmoney&#39;,&#39;5&#39;,&#39;5000-&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">5000以上</div>
+					</div>
+				</div>
+				<div style="color:#828282;width:100%;text-align: left;font-size:16px;height:40px;line-height:40px;text-indent: 10px;">户型</div>
+				<div class="houseType_div" style="width: 100%; font-size: 14px; background: rgb(255, 255, 255); height: 240px;">
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_0" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;0&#39;,&#39;单间带阳台无厨房&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">单间带阳台无厨房</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_1" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;1&#39;,&#39;单间带阳台厨房&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">单间带阳台厨房</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_2" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;2&#39;,&#39;单间无阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">单间无阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_3" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;3&#39;,&#39;单间带阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">单间带阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_4" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;4&#39;,&#39;一室一厅带阳台无厨房&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">一室一厅带阳台无厨房</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_5" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;5&#39;,&#39;一室一厅带阳台厨房&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">一室一厅带阳台厨房</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_6" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;6&#39;,&#39;一室一厅无阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">一室一厅无阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_7" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;7&#39;,&#39;一室一厅有阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">一室一厅有阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_8" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;8&#39;,&#39;两室一厅带阳台厨房&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">两室一厅带阳台厨房</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_9" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;9&#39;,&#39;两室一厅带阳台无厨房&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">两室一厅带阳台无厨房</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_10" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;10&#39;,&#39;两室一厅无阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">两室一厅无阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_11" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;11&#39;,&#39;两室一厅有阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">两室一厅有阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_12" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;12&#39;,&#39;三房一厅带阳台无厨房&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">三房一厅带阳台无厨房</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_13" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;13&#39;,&#39;三房一厅带阳台有厨房&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">三房一厅带阳台有厨房</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_14" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;14&#39;,&#39;三室一厅无阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">三室一厅无阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_15" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;15&#39;,&#39;三室一厅有阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">三室一厅有阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_16" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;16&#39;,&#39;复式loft无阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">复式loft无阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_17" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;17&#39;,&#39;复式loft有阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">复式loft有阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_18" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;18&#39;,&#39;四室一厅无阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">四室一厅无阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_19" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;19&#39;,&#39;四室两厅有阳台&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">四室两厅有阳台</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_20" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;20&#39;,&#39;商铺&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">商铺</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_21" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;21&#39;,&#39;新房出租&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">新房出租</div>
+						</div>
+					
+						<div style="float:left;width: 25%;text-align: center;height:40px;line-height:40px;">
+							<div class="input_houseType_22" onclick="setValue_houseType(&#39;input_houseType&#39;,&#39;22&#39;,&#39;旧房改造&#39;)" style="border-radius:2px;color:#828282;width:80%;margin-left:10%;height:30px;line-height:30px;background:#F5F5F5;">旧房改造</div>
+						</div>
+					
+				</div>
+				<div style="width:100%;height:40px;background:#F9F9F9;padding-top:10px;">
+					<div style="float:left;width: 25%;text-align: center;height:30px;">
+						<div onclick="Reset(&#39;input_rentmoney&#39;)" style="border-radius:2px;color:#828282;width:70%;margin-left:15%;height:30px;line-height:30px;color:#808080;border-radius:2px;border:1px solid #ccc;">重置</div>
+					</div>
+					<div style="float:right;width: 25%;text-align: center;height:30px;">
+						<div onclick="confire()" style="border-radius:2px;color:#828282;width:70%;margin-left:15%;height:30px;line-height:30px;background:#00AE66;color:#fff;border-radius:2px;">确定</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--下拉选项结束-->
+
+	<div class="content" id="content" style="overflow: auto; height: 579px;">
+
+
+
+<div class="div_main" id="div_main" style="height:100%;overflow:auto;opacity:1;-webkit-transform:translate3d(0,0,0);-webkit-overflow-scrolling: touch;">
+	<div id="div_content">
+		<div>
+			<div class="con_image" >
+				<img class="images" src="./findHousingList_images/ample.jpg">
+				<span class="ms"></span>
+				<div class="toumingzi">
+           		 	<span  color="#fff">文字在这</span>
+    			</div>
+    			<div class="mon_view">
+    			</div>
+    			<div style="position: absolute;
+    bottom: 255px;
+    left: 77%;font-size: 12px;color: #FFFFFF;opacity: 1;font-weight: 700;text-align:center;">
+                
+                    ¥<br>{$vo.room_price}<br>&nbsp;整租     
+
+                </div>
+    			<div class="progress">
+				    <div class="progress-bar progress-bar-warning" role="progressbar"
+				         aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+				         style="width: 20%;">
+				    </div>
+				</div>
+				<div class="shengyu" style="position: absolute;margin-left: 78%;margin-top: -25px;font-size: 14px; color: #666666;">
+                	剩余1间
+            	</div>
+
+            	 <hr style="margin-top: 22px;margin-left: 5%;margin-right: 5%;margin-bottom: 7px;">
+
+            	<div class="main_record_div">
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+					<div class="main_padd">
+						<div class="main_ju">
+							<label class="main_label">画画</label>
+							<div class="main_div">
+								{$vo.room_2_2}
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<div class="space"></div>
+	</div>
+
+
+
+
+	<div style="height:70px;width:100%;background:#f2f2f2;line-height:50px;">
+			<div style="height:50px;line-height:50px;width:100%;background:#f8f8f8;position:relative;top:14%">
+				<div style="margin-left:16%;">
+					
+					    
+							<div style="color:#c6cbd2;float:left;width:26.6%;height:40px;text-align:center;margin-top:-15px;line-height:40px;">上一页</div><span style="float:left;color:#cccccc;margin-top:-20px;">|</span>
+					   
+					   
+			 		
+					<div style="color:#a3a3a3;float:left;width:26.6%;height:40px;text-align:center;margin-top:-15px;line-height:40px;"> 1/0</div><span style="float:left;color:#cccccc;margin-top:-20px;">|</span>
+					
+					    
+							<div style="color:#c6cbd2;float:left;width:26.6%;height:40px;text-align:center;margin-top:-15px;line-height:40px;">下一页</div>
+					   
+					   
+			 		
+				</div>
+			</div>
+		</div>
+</div>
+<div class="div_count" style="line-height:26px;background:#00AE66;color:#fff;height:26px;text-align: center;font-size:12px;width:100%;position: absolute; left: 0; top: 86.4px;display:none;">共有0套房源</div>
+<!--<div class="footer" style="position:fixed;line-height:32px;">共有0套房源</div>-->
+</div>
+
+</body>
+</html>
